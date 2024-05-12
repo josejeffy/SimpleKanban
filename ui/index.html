@@ -19,7 +19,7 @@
             <template x-for="i in [0,1,2]">
                 <div class="col">
                     <h2 x-text="buckets[i]" class="bg-danger text-white text-uppercase text-center"></h2>
-                    <template x-for="task in tasks.filter(x=>x.bucket==buckets[i])">
+                    <template x-for="task in tasks.filter(x=>x.bucket==buckets[i] && x.live)">
                         <div class="card p-3 m-2" @click="selected=task.id">
                             <!-- <div class="row">
                             </div> -->
@@ -28,8 +28,11 @@
                                     <button class="btn btn-md btn-warning w-20"
                                     @click="task.bucket=buckets[i-1<0?2:i-1];task.history.push([task.bucket, new Date()])"> &lt;</button>
                                 </div>
-                                <div class="col-8">
-                                    <p x-text="task.name" class="text-center h2 text-uppercase"></p>
+                                <div class="col-8 text-center">
+                                    <p x-text="task.name" class="h2 text-uppercase mb-2"></p>
+                                    <a @click="task.live = false" 
+                                    style="text-decoration: none;"
+                                    class="h3">❌</a>
                                 </div>
                                 <div class="col-2">
                                     <button class="btn btn-md btn-warning w-20"
@@ -66,6 +69,7 @@
                         name: this.newTask,
                         createdAt: new Date().toString(),
                         bucket: 'to do',
+                        live:true,
                         history:[]
                     })
                     this.newTask = ''
