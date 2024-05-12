@@ -30,8 +30,8 @@
                                 </div>
                                 <div class="col-8 text-center">
                                     <p x-text="task.name" class="h2 text-uppercase mb-2"></p>
-                                    <a @click="task.live = false" 
-                                    style="text-decoration: none;"
+                                    <a @click="task.live = false';task.history.push(['archived', new Date()])" 
+                                    style="text-decoration: none"
                                     class="h3">❌</a>
                                 </div>
                                 <div class="col-2">
