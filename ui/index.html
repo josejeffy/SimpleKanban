@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta http-equiv="refresh" content="2"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Kanban</title>
+    <script src="alpine.js" defer></script>
+    <link rel="stylesheet" href="bootstrap.min.css">
+</head>
+
+<body>
+    <div x-data="app" class="container m-5">
+        <div class="col-4 mb-4">
+            <input type="text" x-model="newTask" class="form-control" @change="addTask">
+        </div>
+        <div class="row" style="height: 75vh;overflow-y: scroll;">
+            <template x-for="i in [0,1,2]">
+                <div class="col">
+                    <h2 x-text="buckets[i]" class="bg-danger text-white text-uppercase text-center"></h2>
+                    <template x-for="task in tasks.filter(x=>x.bucket==buckets[i])">
+                        <div class="card p-3 m-2" @click="selected=task.id">
+                            <!-- <div class="row">
+                            </div> -->
+                            <div class="row">
+                                <div class="col-2">
+                                    <button class="btn btn-md btn-warning w-20"
+                                    @click="task.bucket=buckets[i-1<0?2:i-1];task.history.push([task.bucket, new Date()])"> &lt;</button>
+                                </div>
+                                <div class="col-8">
+                                    <p x-text="task.name" class="text-center h2 text-uppercase"></p>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-md btn-warning w-20"
+                                        @click="task.bucket=buckets[i+1>2?0:i+1];task.history.push([task.bucket, new Date()])">&gt;</button>
+                                </div>
+                            </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
+                buckets: ['to do', 'in progress', 'done'],
+                tasks: [],
+                selected:'',
+                newTask: '',
+                init() {
+                    fetch('/load')
+                        .then(resp => resp.json())
+                        .then(tasks => this.tasks = tasks)
+
+                    this.$watch("tasks", () => {
+                        fetch('/update', {
+                            method: "POST",
+                            body: JSON.stringify(this.tasks)
+                        })
+                    })
+                },
+                addTask() {
+                    this.tasks.push({
+                        id: crypto.randomUUID(),
+                        name: this.newTask,
+                        createdAt: new Date().toString(),
+                        bucket: 'to do',
+                        history:[]
+                    })
+                    this.newTask = ''
+                }
+            }))
+        })
+    </script>
+</body>
+
+</html>
